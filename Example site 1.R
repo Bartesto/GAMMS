@@ -160,6 +160,31 @@ ggplot(df, aes(x = date, y = veg - mean(veg))) +
                   colour = "blue", size = 1.5) +
         geom_line(data = pdat, aes(x = Date, y = unlist(m1.dsig$decr)), stat = "identity", 
                   colour = "red", size = 1.5) 
+ggsave("site01_sig_chng_ts.jpeg")
+
+## percentage veg adaption
+y_mod <- pdat$p1 + mean(df$veg)
+y_up <- pdat$upper + mean(df$veg)
+y_low <- pdat$lower + mean(df$veg)
+
+
+ggplot(df, aes(x = date, y = veg)) +
+        geom_point(colour = "dark grey") +
+        geom_line(colour = "dark grey") +
+        theme_bw() +
+        geom_line(data = pdat, aes(x = Date, y = y_mod), stat = "identity", 
+                  colour = "black") +
+        geom_line(data = pdat, aes(x = Date, y = y_up), stat = "identity", 
+                  colour = "black", linetype = 2) +
+        geom_line(data = pdat, aes(x = Date, y = y_low), stat = "identity", 
+                  colour = "black", linetype = 2) +
+        geom_line(data = pdat, aes(x = Date, y = unlist(m1.dsig$incr) + mean(df$veg)), stat = "identity", 
+                  colour = "blue", size = 1.5) +
+        geom_line(data = pdat, aes(x = Date, y = unlist(m1.dsig$decr) + mean(df$veg)), stat = "identity", 
+                  colour = "red", size = 1.5) +
+        ylim(0, 80)
+
+ggsave("site01_sig_chng_ts_origscale.jpeg")
 
 # Spline interactions
 
@@ -179,8 +204,8 @@ for (i in 1:4) {
 
 anova(nm$lme, nm1$lme, nm2$lme, nm3$lme, nm4$lme)
 
-plot(acf(resid(nm$lme, type = "normalized")))
-summary(nm$gam)
+plot(acf(resid(nm1$lme, type = "normalized")))
+summary(nm1$gam)
 
 # monthly
 npdat <- with(df,
@@ -200,12 +225,12 @@ p3 <- ggplot(npdat, aes(x = nMonth, y = fitted, group = fYear)) +
         geom_line(aes(colour = fYear)) +    # predicted temperatures
         theme_bw() +                        # minimal theme
         theme(legend.position = "top") +    # push legend to the top
-        labs(y = expression(Temperature ~ (degree*C)), x = NULL) +
+        labs(y = "vegetation cover %", x = NULL) +
         scale_fill_discrete(name = "Year") + # correct legend name
         scale_colour_discrete(name = "Year") +
         scale_x_continuous(breaks = 1:12,   # tweak where the x-axis ticks are
                            labels = month.abb, # & with what labels
                            minor_breaks = NULL)
 p3
-
+ggsave("site01_1990-2014.jpeg")
 
